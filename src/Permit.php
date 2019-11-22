@@ -268,4 +268,56 @@ class Permit
         session()->put($this->SESSION_ROLE_KEY,$data['role']);
         session()->put($this->SESSION_ABILITIES_KEY,$data['abilities']);
     }
+
+    public function attachAbilities($roleId,$moduleId,$permissions)
+    {
+        if(!is_array($permissions)) {
+            $permissions = [$permissions];
+        }
+
+        $abilities = Ability::where('role_id',$roleId)->where('module_id',$moduleId)->get();
+
+        $makePermissionsWith = $permissions;
+
+        if(count($abilities) > 0) {
+
+            $existingPermissions = [];
+
+            foreach($abilities as $key => $ability) {
+                array_push($existingPermissions, $ability->permission_id);
+            }
+
+            $makePermissionsWith = array_diff($permissions,$existingPermissions);
+
+            if(count($makePermissionsWith) === 0) return false;
+        }
+
+        $data = $this->_makeAbilitiesArray($roleId,$moduleId,$makePermissionsWith);
+
+        return Ability::insert($data);
+    }
+
+    private function _makeAbilitiesArray(int $roleId,int $moduleId,array $permissions)
+    {
+        $array = [];
+
+        foreach($permissions as $perm) {
+            $array[] = [
+                'role_id'       => $roleId,
+                'module_id'     => $moduleId,
+                'permission_id' => $perm
+            ];
+        }
+
+        return $array;
+    }
+
+    public function detachAbilities($roleId,$moduleId,$permissions)
+    {
+        if(!is_array($permissions)) {
+            $permissions = [$permissions];
+        }
+
+        return Ability::where('role_id',$roleId)->where('module_id',$moduleId)->whereIn('permission_id',$permissions)->delete();
+    }
 }

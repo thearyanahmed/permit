@@ -12,10 +12,10 @@ class Role extends Model
 
     protected $primaryKey = 'id';
 
-    public function abilities()
-    {
-        return $this->hasMany(Ability::class,'role_id');
-    }
+    // public function abilities()
+    // {
+    //     return $this->hasMany(Ability::class,'role_id');
+    // }
 
     public function modules()
     {
