@@ -1,0 +1,29 @@
+{
+    "name": "prophecy/permit",
+    "description": "A role based permission package that works on modules for laravel.",
+    "type": "package",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Aryan Ahmed Anik",
+            "email": "thearyanahmed@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "extra": {
+        "laravel": {
+            "providers": [
+                "prophecy\\permit\\PermitServiceProvider"
+            ]
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Prophecy\\Permit\\": "src/"
+        },
+        "files" : [
+            "helpers/permit.php"
+        ]
+    }
+}
