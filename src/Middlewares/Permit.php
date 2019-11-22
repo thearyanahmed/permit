@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Middleware;
+namespace Prophecy\Permit\Middlewares;
 
 use Closure;
 use Illuminate\Support\Facades\Auth;
