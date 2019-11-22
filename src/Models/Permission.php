@@ -9,9 +9,4 @@ class Permission extends Model
     protected $table = 'permissions';
 
     protected $guarded = ['id'];
-
-    public function role()
-    {
-        return $this->belongsTo(Role::class);
-    }
 }

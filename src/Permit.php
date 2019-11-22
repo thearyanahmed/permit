@@ -2,8 +2,11 @@
 
 namespace Prophecy\Permit;
 
-use Prophecy\Permit\Exceptions\ModuleNotFoundException;
-use Prophecy\Permit\Exceptions\PermissionNotFoundException;
+use Prophecy\Permit\Exceptions\{
+    RoleNotFoundException,
+    ModuleNotFoundException,
+    PermissionNotFoundException
+};
 use Prophecy\Permit\Models\Ability;
 use Prophecy\Permit\Models\Module;
 use Prophecy\Permit\Models\Permission;
@@ -11,31 +14,39 @@ use Prophecy\Permit\Models\Role;
 
 class Permit
 {
-    private  $SESSION_ROLE_KEY      = '_user_role';
+    private  $SESSION_ROLE_KEY;
 
-    private  $SESSION_ABILITIES_KEY = '_user_abilities';
+    private  $SESSION_ABILITIES_KEY;
 
     public function __construct()
     {
-//        $this->SESSION_ABILITIES_KEY = config('session_abilities_key');
-//        $this->SESSION_ROLE_KEY      = config('session_role_key');
+       $this->SESSION_ABILITIES_KEY = config('permit.session_abilities_key');
+       $this->SESSION_ROLE_KEY      = config('permit.session_role_key');
     }
 
-    public function createRole()
+    public function createRole(array $attributes)
     {
-        $data = [
-            ['name' => 'admin'],
-            ['name' => 'volunteer'],
-            ['name' => 'user'],
-            ['name' => 'super_admin'],
-        ];
+        return Role::create($attributes);
+    }
 
-        return Role::insert($data);
+    public function createMultipleRole(array $roles)
+    {
+        return Role::inset($roles);
     }
 
     public function findRole(string $name)
     {
-        return Role::where('name',$name)->first();
+        return $this->_findRole('name',$name);
+    }
+
+    public function findRoleById(int $id)
+    {
+        return $this->_findRole('id',$id);
+    }
+
+    private function _findRole(string $column,$value)
+    {
+        return Role::where($column,$value)->first();
     }
 
     public function allRoles()
@@ -43,23 +54,50 @@ class Permit
         return Role::all();
     }
 
-    public function createPermission()
+    public function updateRole(array $attributes,int $id)
     {
-        $data = [
-            ['name' => 'create'],
-            ['name' => 'read'],
-            ['name' => 'edit'],
-            ['name' => 'update'],
-            ['name' => 'delete'],
-            ['name' => 'force_delete']
-        ];
+        $role = $this->_findRole('id',$id);
 
-        return Permission::insert($data);
+        if(!$role) {
+            throw new RoleNotFoundException;
+        }
+
+        return $role->update($attributes);
     }
 
-    public function findPermission($value,$column = 'name')
+    public function deleteRole(int $id)
+    {
+        $role = $this->_findRole('id',$id);
+
+        if(!$role) {
+            throw new RoleNotFoundException;
+        }
+        return $role->delete();
+    }
+
+    public function createPermission(array $attributes)
+    {
+        return Permission::create($attributes);
+    }
+
+    public function createMultiplePermission(array $permissions)
+    {
+        return Permission::insert($permissions);
+    }
+
+    private function _findPermission(string $column,$value)
     {
         return Permission::where($column,$value)->first();
+    }
+
+    public function findPermission(string $name)
+    {
+        return $this->_findPermission('name',$name);
+    }
+
+    public function findPermissionById(int $id)
+    {
+        return $this->_findPermission('id',$id);
     }
 
     public function allPermissions()
@@ -67,19 +105,43 @@ class Permit
         return Permission::all();
     }
 
-    public function createModule()
+    public function updatePermission(array $attributes,int $id)
     {
-        $data = [
-            ['name' => 'user'],
-            ['name' => 'campaign'],
-            ['name' => 'payout'],
-            ['name' => 'ad'],
-        ];
+        $perm = $this->_findPermission('id',$id);
 
-        return Module::insert($data);
+        if(!$perm) {
+            throw new PermissionNotFoundException;
+        }
+
+        return $perm->update($attributes);
+    }
+
+    public function deletePermission(int $id)
+    {
+        $perm = $this->_findPermission('id',$id);
+
+        if(!$perm) {
+            throw new PermissionNotFoundException;
+        }
+        return $perm->delete();
+    }
+
+    public function createModule(array $attributes)
+    {
+        return Module::create($attributes);
     }
 
     public function findModule($value,$column = 'name')
+    {
+        return $this->_findModule($column,$value);
+    }
+
+    public function findModuleById(int $id)
+    {
+        return $this->_findModule('id',$id);
+    }
+
+    private function _findModule(string $column,$value)
     {
         return Module::where($column,$value)->first();
     }
@@ -89,9 +151,9 @@ class Permit
         return Module::all();
     }
 
-    public function findAbilitiesOf(string $role)
+    public function findAbilitiesOf($role,$column = 'name')
     {
-        $role = $this->findRole($role);
+        $role = $this->_findRole($column,$role);
 
         if($role) {
             $role->load(['modules' => function($module) {
@@ -121,7 +183,7 @@ class Permit
 
                 $abilities[$module->name] = $data;
             }
-            return $abilities;
+            return ['role' => $role, 'abilities' =>  $abilities] ;
         }
 
         return collect([]);
@@ -193,5 +255,69 @@ class Permit
     private function _findAbility(int $roleId, int $moduleId, int $permissionId)
     {
         return Ability::where('role_id',$roleId)->where('module_id',$moduleId)->where('permission_id',$permissionId)->first();
+    }
+
+    public function setAuthUserAbilities(int $roleId)
+    {
+        if(!auth()->check()) return false;
+
+        $data = $this->findAbilitiesOf($roleId,'id');
+
+        if(empty($data)) return false;
+
+        session()->put($this->SESSION_ROLE_KEY,$data['role']);
+        session()->put($this->SESSION_ABILITIES_KEY,$data['abilities']);
+    }
+
+    public function attachAbilities($roleId,$moduleId,$permissions)
+    {
+        if(!is_array($permissions)) {
+            $permissions = [$permissions];
+        }
+
+        $abilities = Ability::where('role_id',$roleId)->where('module_id',$moduleId)->get();
+
+        $makePermissionsWith = $permissions;
+
+        if(count($abilities) > 0) {
+
+            $existingPermissions = [];
+
+            foreach($abilities as $key => $ability) {
+                array_push($existingPermissions, $ability->permission_id);
+            }
+
+            $makePermissionsWith = array_diff($permissions,$existingPermissions);
+
+            if(count($makePermissionsWith) === 0) return false;
+        }
+
+        $data = $this->_makeAbilitiesArray($roleId,$moduleId,$makePermissionsWith);
+
+        return Ability::insert($data);
+    }
+
+    private function _makeAbilitiesArray(int $roleId,int $moduleId,array $permissions)
+    {
+        $array = [];
+
+        foreach($permissions as $perm) {
+            $array[] = [
+                'role_id'       => $roleId,
+                'module_id'     => $moduleId,
+                'permission_id' => $perm
+            ];
+        }
+
+        return $array;
+    }
+
+    public function detachAbilities($roleId,$moduleId,$permissions)
+    {
+        if(!is_array($permissions)) {
+            $permissions = [$permissions];
+        }
+
+        return Ability::where('role_id',$roleId)->where('module_id',$moduleId)->whereIn('permission_id',$permissions)->delete();
     }
 }
