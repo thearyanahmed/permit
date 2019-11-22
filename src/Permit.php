@@ -264,8 +264,16 @@ class Permit
         $data = $this->findAbilitiesOf($roleId,'id');
 
         if(empty($data)) return false;
-
-        session()->put($this->SESSION_ROLE_KEY,$data['role']);
+        
+        
+        if(empty($data)) return false;
+       
+        $roleInfo = [
+            'id' => $data['role']->id,
+            'name' => $data['role']->name
+        ];
+        
+        session()->put($this->SESSION_ROLE_KEY,$roleInfo);
         session()->put($this->SESSION_ABILITIES_KEY,$data['abilities']);
         
         return true;
