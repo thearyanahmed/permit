@@ -3,10 +3,10 @@
 namespace Prophecy\Permit;
 
 use Prophecy\Permit\Exceptions\{
-    ModuleNotFoundException,
+    RoleNotFoundException,
     ModuleNotFoundException,
     PermissionNotFoundException
-}
+};
 use Prophecy\Permit\Models\Ability;
 use Prophecy\Permit\Models\Module;
 use Prophecy\Permit\Models\Permission;
@@ -116,7 +116,7 @@ class Permit
         return $perm->update($attributes);
     }
 
-    public function deleteRole(int $id)
+    public function deletePermission(int $id)
     {
         $perm = $this->_findPermission('id',$id);
 
@@ -128,7 +128,7 @@ class Permit
 
     public function createModule(array $attributes)
     {
-        return Module::create($data);
+        return Module::create($attributes);
     }
 
     public function findModule($value,$column = 'name')
@@ -151,9 +151,9 @@ class Permit
         return Module::all();
     }
 
-    public function findAbilitiesOf(string $role)
+    public function findAbilitiesOf($role,$column = 'name')
     {
-        $role = $this->findRole($role);
+        $role = $this->_findRole($column,$role);
 
         if($role) {
             $role->load(['modules' => function($module) {
@@ -183,7 +183,7 @@ class Permit
 
                 $abilities[$module->name] = $data;
             }
-            return $abilities;
+            return ['role' => $role, 'abilities' =>  $abilities] ;
         }
 
         return collect([]);
@@ -255,5 +255,17 @@ class Permit
     private function _findAbility(int $roleId, int $moduleId, int $permissionId)
     {
         return Ability::where('role_id',$roleId)->where('module_id',$moduleId)->where('permission_id',$permissionId)->first();
+    }
+
+    public function setAuthUserAbilities(int $roleId)
+    {
+        if(!auth()->check()) return false;
+
+        $data = $this->findAbilitiesOf($roleId,'id');
+
+        if(empty($data)) return false;
+
+        session()->put($this->SESSION_ROLE_KEY,$data['role']);
+        session()->put($this->SESSION_ABILITIES_KEY,$data['abilities']);
     }
 }
