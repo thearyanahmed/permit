@@ -267,6 +267,8 @@ class Permit
 
         session()->put($this->SESSION_ROLE_KEY,$data['role']);
         session()->put($this->SESSION_ABILITIES_KEY,$data['abilities']);
+        
+        return true;
     }
 
     public function attachAbilities($roleId,$moduleId,$permissions)
