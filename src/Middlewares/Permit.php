@@ -22,6 +22,5 @@ class Permit
             return $next($request);
         }
         return redirect($this->redirectTo);
-
     }
 }
