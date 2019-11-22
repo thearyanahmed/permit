@@ -14,7 +14,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "prophecy\\permit\\PermitServiceProvider"
+                "Prophecy\\Permit\\PermitServiceProvider"
             ]
         }
     },
