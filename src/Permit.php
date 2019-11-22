@@ -2,12 +2,12 @@
 
 namespace Prophecy\Permit;
 
-use Permit\Exceptions\ModuleNotFoundException;
-use Permit\Exceptions\PermissionNotFoundException;
-use Permit\Models\Ability;
-use Permit\Models\Module;
-use Permit\Models\Permission;
-use Permit\Models\Role;
+use Prophecy\Permit\Exceptions\ModuleNotFoundException;
+use Prophecy\Permit\Exceptions\PermissionNotFoundException;
+use Prophecy\Permit\Models\Ability;
+use Prophecy\Permit\Models\Module;
+use Prophecy\Permit\Models\Permission;
+use Prophecy\Permit\Models\Role;
 
 class Permit
 {
