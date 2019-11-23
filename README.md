@@ -38,8 +38,7 @@ session('_user_abilities') // returns you an array of abilities the user can per
 
 ### API 
 
-***The package except your application to have role associated with your user***
-***This package support User to have 1 role (1 to 1 relation)***
+***The package excepts your application to have role associated with your user.This package support User to have 1 role (1 to 1 relation)***
 
 
 After migrating you'll see 4 additional tables in your database.Being the following `roles`,`modules`,
@@ -174,6 +173,15 @@ $permit->detachAbilities($role->id,$module->id,$permissions);
 $permit->findAbilitiesOf($role->name);
 ```
 
+`findAbilitiesOf` function also takes a second option string argument,which is the `column_name` to look for in the `roles` table.By default it is set to `name`. You can also use `id` by doing the following.
+
+
+```
+$permit->findAbilitiesOf($role->id,'id');
+```
+
+
+
 Will return an array.
 
 
@@ -222,7 +230,7 @@ Will return an array.
 ]
 ```
 
-Note:The response will return a true false value based on the permissions attached with role -> module -> permissions.If you have **create** and **edit** permission attached to **hr** module, the response will also the remaining permissions but the value will be `false`.
+Note:The response will return a true false value based on the permissions attached with role -> module -> permissions.If you have **create** and **edit** permission attached to **hr** module, the response will also return the remaining permissions but the value will be `false`.
 
 
 #### Using can
@@ -263,13 +271,13 @@ And like `can`, **authUserCan** also has a helper `auth_user_can` with the same 
 You can simply call `setAuthUserAbilities` with the `$roleId` as parameter.
 
 ```
- $permit->setAuthUserAbilities(auth()->user()->role_id); // role_id is numeric.
+$permit->setAuthUserAbilities(auth()->user()->role_id); // role_id is numeric.
 ```
 
 
 #### Middleware
 
-In your kernel , in the `route` middlewares array,paste 
+add the following line in in the `route` middlewares array of `App\Http\Kernel` 
 
 ```
 'permit' => \Prophecy\Permit\Middlewares\Permit::class,
