@@ -12,13 +12,8 @@ class Role extends Model
 
     protected $primaryKey = 'id';
 
-    // public function abilities()
-    // {
-    //     return $this->hasMany(Ability::class,'role_id');
-    // }
-
     public function modules()
     {
-        return $this->hasManyThrough(Module::class,Ability::class,'role_id','id');
+        return $this->hasManyThrough(Module::class,Ability::class,'role_id','id','id','module_id');
     }
 }
