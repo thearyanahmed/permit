@@ -277,7 +277,7 @@ $permit->setAuthUserAbilities(auth()->user()->role_id); // role_id is numeric.
 
 #### Middleware
 
-add the following line in in the `route` middlewares array of `App\Http\Kernel` 
+add the following line in  the `route` middlewares array of `App\Http\Kernel` 
 
 ```
 'permit' => \Prophecy\Permit\Middlewares\Permit::class,
