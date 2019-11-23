@@ -182,7 +182,7 @@ $permit->findAbilitiesOf($role->id,'id');
 
 
 
-Will return an array.
+Will return an array (this is a JSON response.In php,you'll get an associative array).
 
 
 ```
