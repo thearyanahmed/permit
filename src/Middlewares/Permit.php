@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Auth;
 
 class Permit
 {
-    protected $redirectTo = '/';
+    protected $redirectTo;
 
     public function __construct()
     {
@@ -24,7 +24,7 @@ class Permit
      */
     public function handle($request, Closure $next, $module, $permission)
     {
-        if (user_can($permission,$module) === true) {
+        if (auth_user_can($permission,$module) === true) {
             return $next($request);
         }
         return redirect()->route($this->redirectTo);
