@@ -156,8 +156,11 @@ class Permit
         $role = $this->_findRole($column,$role);
 
         if($role) {
-            $role->load(['modules' => function($module) {
-                $module->with('permissions');
+
+            $modules = $role->load(['modules' => function($modules) use ($role) {
+                $modules->with(['permissions' => function($perms) use ($role) {
+                    $perms->where('role_id',$role->id);
+                }])->groupBy('module_id');
             }]);
 
             $abilities = [];
@@ -330,7 +333,6 @@ class Permit
         if(!is_array($permissions)) {
             $permissions = [$permissions];
         }
-
-        return Ability::where('role_id',$roleId)->where('module_id',$moduleId)->whereIn('permission_id',$permissions)->delete();
+        return (bool) Ability::where('role_id',$roleId)->where('module_id',$moduleId)->whereIn('permission_id',$permissions)->delete();
     }
 }
