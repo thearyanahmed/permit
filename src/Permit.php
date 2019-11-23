@@ -208,24 +208,25 @@ class Permit
 
             return $this->_findInDb($module,$permission,$roleId);
         }
-        
+
         return $this->_findInSession($module,$permission);
     }
-    
+
     public function can($permission,$module,$roleId)
     {
         return $this->_findInDb($module,$permission,$roleId);
     }
-    
+
     private function _findInSession($module,$permission)
     {
         $data = session($this->SESSION_ABILITIES_KEY);
 
-        if(!isset($data[$module])) {
-            return false;
+        if(isset($data[$module])) {
+            if(isset($data[$module][$permission])) {
+                return (bool) $data[$module][$permission];
+            }
         }
-
-        return (bool) $data[$module][$permission];
+        return false;
     }
 
     /**
