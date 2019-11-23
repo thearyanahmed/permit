@@ -3,7 +3,7 @@
 use Prophecy\Permit\Permit;
 
 if(!function_exists('user_can')) {
-    function user_can(string $permission,string $module,$roleId) {
+    function user_can($permission,$module,$roleId) {
         $permit = app()->make(Permit::class);
         return $permit->can($permission,$module,$findInSession);
     }
