@@ -212,7 +212,7 @@ class Permit
         return $this->_findInSession($module,$permission);
     }
     
-    public function can(string $permission,string $module,$roleId)
+    public function can($permission,$module,$roleId)
     {
         return $this->_findInDb($module,$permission,$roleId);
     }
