@@ -183,6 +183,9 @@ class Permit
 
                 $abilities[$module->name] = $data;
             }
+
+            unset($role->modules);
+
             return ['role' => $role, 'abilities' =>  $abilities] ;
         }
 
@@ -264,18 +267,18 @@ class Permit
         $data = $this->findAbilitiesOf($roleId,'id');
 
         if(empty($data)) return false;
-        
-        
+
+
         if(empty($data)) return false;
-       
+
         $roleInfo = [
             'id' => $data['role']->id,
             'name' => $data['role']->name
         ];
-        
+
         session()->put($this->SESSION_ROLE_KEY,$roleInfo);
         session()->put($this->SESSION_ABILITIES_KEY,$data['abilities']);
-        
+
         return true;
     }
 
