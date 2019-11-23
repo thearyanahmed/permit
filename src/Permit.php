@@ -201,17 +201,22 @@ class Permit
      * @param bool $findInSession
      * @return bool
      */
-    public function can($module, $permission,bool $findInSession = true)
+    public function authUserCan($permission,$module,bool $findInSession = true)
     {
-        $method = '_findInSession';
-
         if(!$findInSession) {
-            $method = '_findInDb';
+            $roleId = session()->get($this->SESSION_ROLE_KEY)['id'];
+
+            return $this->_findInDb($module,$permission,$roleId);
         }
-
-        return $this->{$method}($module,$permission);
+        
+        return $this->_findInSession($module,$permission);
     }
-
+    
+    public function can(string $permission,string $module,$roleId)
+    {
+        return $this->_findInDb($module,$permission,$roleId);
+    }
+    
     private function _findInSession($module,$permission)
     {
         $data = session($this->SESSION_ABILITIES_KEY);
@@ -231,9 +236,8 @@ class Permit
      * @throws ModuleNotFoundException
      * @throws PermissionNotFoundException
      */
-    private function _findInDb($module, $permission)
+    private function _findInDb($module, $permission,$roleId)
     {
-        $roleId = session()->get($this->SESSION_ROLE_KEY)['id'];
 
         if(false === $module instanceof Module) {
             $module = $this->findModule($module);
