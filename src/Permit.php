@@ -187,7 +187,7 @@ class Permit
                 $abilities[$module->name] = $data;
             }
 
-            unset($role->modules);
+            unset($role->modules,$role->created_at,$role->updated_at);
 
             return ['role' => $role, 'abilities' =>  $abilities] ;
         }
