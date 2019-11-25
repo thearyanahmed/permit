@@ -15,3 +15,11 @@ if(!function_exists('auth_user_can')) {
         return $permit->authUserCan($permission,$module,$findInSession);
     }
 }
+
+
+if(!function_exists('abilities_of')) {
+    function abilities_of($role,$column = 'name') {
+        $permit = app()->make(Permit::class);
+        return $permit->findAbilitiesOf($role,$column);
+    }
+}
