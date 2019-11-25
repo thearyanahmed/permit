@@ -151,6 +151,27 @@ class Permit
         return Module::all();
     }
 
+    public function updateModule(array $attributes,int $id)
+    {
+        $module = $this->_findModule('id',$id);
+
+        if(!$module) {
+            throw new RoleNotFoundException;
+        }
+
+        return $module->update($attributes);
+    }
+
+    public function deleteModule(int $id)
+    {
+        $module = $this->_findModule('id',$id);
+
+        if(!$module) {
+            throw new RoleNotFoundException;
+        }
+        return $module->delete();
+    }
+    
     public function findAbilitiesOf($role,$column = 'name')
     {
         $role = $this->_findRole($column,$role);
