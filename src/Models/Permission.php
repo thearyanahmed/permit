@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Permission extends Model
 {
-    protected $table = 'modules';
+    protected $table = 'permissions';
 
     protected $guarded = ['id'];
 
