@@ -225,14 +225,13 @@ class Permit
     /**
      * @param $module
      * @param $permission
+     * @param $roleId
      * @param bool $findInSession
      * @return bool
      */
-    public function authUserCan($permission,$module,bool $findInSession = true)
+     public function authUserCan($permission,$module,$roleId = null,bool $findInSession = true)
     {
         if(!$findInSession) {
-            $roleId = session()->get($this->SESSION_ROLE_KEY)['id'];
-
             return $this->_findInDb($module,$permission,$roleId);
         }
 
