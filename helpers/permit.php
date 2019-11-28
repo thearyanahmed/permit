@@ -9,11 +9,18 @@ if(!function_exists('user_can')) {
     }
 }
 
+
+
 if(!function_exists('auth_user_can')) {
      function auth_user_can($permission,$module) {
         $findInSession = config('permit.find_in_session');
+
+        $roleColumn = config('permit.role_column');
+
+        $roleId = auth()->user()->{$roleColumn};
+
         $permit = app()->make(Permit::class);
-        return $permit->authUserCan($permission,$module,$findInSession);
+        return $permit->authUserCan($permission,$module,$roleId,$findInSession);
     }
 }
 
