@@ -5,12 +5,13 @@ use Prophecy\Permit\Permit;
 if(!function_exists('user_can')) {
     function user_can($permission,$module,$roleId) {
         $permit = app()->make(Permit::class);
-        return $permit->can($permission,$module,$findInSession);
+        return $permit->can($permission,$module,$roleId);
     }
 }
 
 if(!function_exists('auth_user_can')) {
-    function auth_user_can($permission,$module,bool $findInSession = true) {
+     function auth_user_can($permission,$module) {
+        $findInSession = config('permit.find_in_session');
         $permit = app()->make(Permit::class);
         return $permit->authUserCan($permission,$module,$findInSession);
     }
