@@ -59,7 +59,8 @@ class Permit
         $role = $this->_findRole('id',$id);
 
         if(!$role) {
-            throw new RoleNotFoundException;
+            return false;
+//             throw new RoleNotFoundException;
         }
 
         return $role->update($attributes);
@@ -70,7 +71,8 @@ class Permit
         $role = $this->_findRole('id',$id);
 
         if(!$role) {
-            throw new RoleNotFoundException;
+            return false;
+//             throw new RoleNotFoundException;
         }
         return $role->delete();
     }
@@ -110,7 +112,8 @@ class Permit
         $perm = $this->_findPermission('id',$id);
 
         if(!$perm) {
-            throw new PermissionNotFoundException;
+            return false; 
+//             throw new PermissionNotFoundException;
         }
 
         return $perm->update($attributes);
@@ -121,7 +124,8 @@ class Permit
         $perm = $this->_findPermission('id',$id);
 
         if(!$perm) {
-            throw new PermissionNotFoundException;
+            return false;
+//             throw new PermissionNotFoundException;
         }
         return $perm->delete();
     }
@@ -156,7 +160,8 @@ class Permit
         $module = $this->_findModule('id',$id);
 
         if(!$module) {
-            throw new RoleNotFoundException;
+            return false;
+//             throw new RoleNotFoundException;
         }
 
         return $module->update($attributes);
@@ -167,7 +172,8 @@ class Permit
         $module = $this->_findModule('id',$id);
 
         if(!$module) {
-            throw new RoleNotFoundException;
+            return false;
+//             throw new RoleNotFoundException;
         }
         return $module->delete();
     }
@@ -264,14 +270,16 @@ class Permit
         if(false === $module instanceof Module) {
             $module = $this->findModule($module);
             if($module === null) {
-                throw new ModuleNotFoundException;
+                return false;
+//                 throw new ModuleNotFoundException;
             }
         }
 
         if(false === $permission instanceof Permission) {
             $permission = $this->findPermission($permission);
             if($permission === null) {
-                throw new PermissionNotFoundException;
+                return false;
+//                 throw new PermissionNotFoundException;
             }
         }
 
