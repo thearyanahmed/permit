@@ -12,6 +12,6 @@ class Module extends Model
 
     public function permissions()
     {
-        return $this->hasManyThrough(Permission::class,Ability::class,'module_id','id');
+        return $this->hasManyThrough(Permission::class,Ability::class,'module_id','id','id','permission_id');
     }
 }
